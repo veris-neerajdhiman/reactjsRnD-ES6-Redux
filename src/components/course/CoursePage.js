@@ -1,44 +1,60 @@
-import React, {Proptypes} from 'react';
+import React, {PropTypes} from 'react';
+import {connect} from 'react-redux';
+import * as courseActions from '../../actions/courseAction';
+import {bindActionCreators} from 'redux';
+import CourseList from './CourseList';
+import {browserHistory} from 'react-router';
 
-class Course extends React.Component{
+class CoursePage extends React.Component{
   constructor(props, context){
     super(props, context);
 
-    this.state = {
-      course: {title: ''}
-    };
-
-    this.onTitleChange = this.onTitleChange.bind(this);
-    this.onClickSave = this.onClickSave.bind(this);
+    this.redirectToAddCoursePage = this.redirectToAddCoursePage.bind(this);
   }
 
-  onTitleChange(event){
-    const course = this.state.course;
-    course.title = event.target.value;
-    this.setState({course: course});
+  courseRow(course, index) {
+    return <div key={index}>{course.title}</div>;
   }
 
-  onClickSave(event){
-    alert("save button clicked.")
+  redirectToAddCoursePage(){
+    browserHistory.push('/course');
   }
 
   render(){
+    const {courses} = this.props;
+
     return (
       <div>
-        <input
-          type="text"
-          onChange={this.onTitleChange}
-          value={this.state.course.title}
+        <h1>Courses : </h1>
+        <input type="submit"
+               value="Add Course"
+               className="btn btn-primary"
+               onClick={this.redirectToAddCoursePage}
         />
-
-        <input
-          type="submit"
-          onClick={this.onClickSave}
-          value="Save"
-        />
+        <CourseList courses={courses}/>
       </div>
-    )
+    );
   }
 }
 
-export default Course;
+
+// Proptypes that provide our proptype validation
+CoursePage.propTypes = {
+  courses: PropTypes.array.isRequired,
+  actions: PropTypes.object.isRequired
+};
+
+// Our redux connect and related functions ******************
+function mapStateToProps(state, ownProps) {
+  return {
+    courses: state.courses
+  };
+}
+
+function  mapDispatchToProps(dispatch) {
+  return {
+    actions: bindActionCreators(courseActions, dispatch)
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CoursePage);
